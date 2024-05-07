@@ -62,15 +62,15 @@ async function getReply(name, text) {
         }
         var property = [11]
         for (let i = 0; i < count; i++) {
-            property[0] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + Math.round(Math.random() * 6)) * 5;//力量3d6*5
-            property[1] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + Math.round(Math.random() * 6)) * 5;//体质3d6*5
-            property[2] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + 6) * 5;//体型(2d6+6)*5
-            property[3] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + Math.round(Math.random() * 6)) * 5;//敏捷3d6*5
-            property[4] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + Math.round(Math.random() * 6)) * 5;//外貌3d6*5
-            property[5] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + 6) * 5;//智力(2d6+6)*5
-            property[6] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + Math.round(Math.random() * 6)) * 5;//意志3d6*5
-            property[7] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + 6) * 5;//教育(2d6+6)*5
-            property[8] = (Math.round(Math.random() * 6) + Math.round(Math.random() * 6) + Math.round(Math.random() * 6)) * 5;//幸运3d6*5
+            property[0] = (getRandomInt(6) + getRandomInt(6) + getRandomInt(6)) * 5;//力量3d6*5
+            property[1] = (getRandomInt(6) + getRandomInt(6) + getRandomInt(6)) * 5;//体质3d6*5
+            property[2] = (getRandomInt(6) + getRandomInt(6) + 6) * 5;//体型(2d6+6)*5
+            property[3] = (getRandomInt(6) + getRandomInt(6) + getRandomInt(6)) * 5;//敏捷3d6*5
+            property[4] = (getRandomInt(6) + getRandomInt(6) + getRandomInt(6)) * 5;//外貌3d6*5
+            property[5] = (getRandomInt(6) + getRandomInt(6) + 6) * 5;//智力(2d6+6)*5
+            property[6] = (getRandomInt(6) + getRandomInt(6) + getRandomInt(6)) * 5;//意志3d6*5
+            property[7] = (getRandomInt(6) + getRandomInt(6) + 6) * 5;//教育(2d6+6)*5
+            property[8] = (getRandomInt(6) + getRandomInt(6) + getRandomInt(6)) * 5;//幸运3d6*5
 
             property[9] = property[0] + property[1] + property[2] + property[3] + property[4] + property[5] + property[6] + property[7];
             property[10] = property[0] + property[1] + property[2] + property[3] + property[4] + property[5] + property[6] + property[7] + property[8];
@@ -80,4 +80,8 @@ async function getReply(name, text) {
         }
     }
     return str;
+}
+
+function getRandomInt(max){
+	return Math.floor(Math.random() * max)+1;
 }
