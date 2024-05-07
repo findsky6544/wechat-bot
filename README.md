@@ -28,6 +28,18 @@ npm run start
 ```
 nohup npm run start & exit
 ```
+如果想关闭可以
+```
+ps -A //查询pid
+kill [pid]
+```
 
 ## 自定义
 修改/src/wechaty/sendMessage.js，改完后重启即可
+
+## 错误处理
+### npm install报javascript heap out of memory
+内存较小，可以尝试运行
+```
+node --max-old-space-size=8000 $(which npm) install
+```
