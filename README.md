@@ -13,7 +13,7 @@
 
 3.在控制台运行
 ```
-git clone https://github.com/findsky6544/wechat-bot.git
+git clone https://github.com/findsky6544/wechat-dice-bot.git
 cd wechat-bot
 npm install
 ```
