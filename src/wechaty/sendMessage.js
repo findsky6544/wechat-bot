@@ -7,7 +7,6 @@ import { botName, roomWhiteList, aliasWhiteList } from '../../config.js'
  * @returns {Promise<void>}
  */
 export async function defaultMessage(msg, bot) {
-    console.log('defaultMessage')
     const contact = msg.talker() // 发消息人
     const receiver = msg.to() // 消息接收人
     const content = msg.text() // 消息内容
@@ -22,7 +21,6 @@ export async function defaultMessage(msg, bot) {
     const isAlias = aliasWhiteList.includes(remarkName) || aliasWhiteList.includes(name) // 发消息的人是否在联系人白名单内
     const isBotSelf = botName === remarkName || botName === name // 是否是机器人自己
     // TODO 你们可以根据自己的需求修改这里的逻辑
-console.log(msg.type() )
     if (isBotSelf || !isText) return // 如果是机器人自己发送的消息或者消息类型不是文本则不处理
     try {
         // 区分群聊和私聊
@@ -75,7 +73,7 @@ async function getReply(name, text) {
             property[9] = property[0] + property[1] + property[2] + property[3] + property[4] + property[5] + property[6] + property[7];
             property[10] = property[0] + property[1] + property[2] + property[3] + property[4] + property[5] + property[6] + property[7] + property[8];
             str += '\n----------------------------------------'
-            str += '\n力量STR：' + property[0] + ',体质CON：' + property[1] + ',体型SIZ：' + property[2] + ',敏捷DEX：' + property[3] + ',外貌APP：' + property[4] + ',智力INT：' + property[5] + ',意志POW：' + property[6] + ',教育EDU：' + property[7] + ',幸运LUK：' + property[8] + ',总和(不含幸运)SUM：' + property[9] + '(' + property[10] + ')'
+            str += '\n力量STR：' + property[0] + '，体质CON：' + property[1] + '，体型SIZ：' + property[2] + '，敏捷DEX：' + property[3] + '，外貌APP：' + property[4] + '，智力INT：' + property[5] + '，意志POW：' + property[6] + '，教育EDU：' + property[7] + '，幸运LUK：' + property[8] + '，总和(不含幸运)SUM：' + property[9] + '(' + property[10] + ')'
 
         }
     }

@@ -23,19 +23,23 @@ function onLogin(user) {
     console.log(`${user} 已登录`)
     const date = new Date()
     console.log(`Current time:${date}`)
-    console.log(`Automatic robot chat mode has been activated`)
 }
 
 // 登出
 function onLogout(user) {
-    console.log(`${user} has logged out`)
+    console.log(`${user} 已登出`)
 }
 
 // 收到好友请求
 async function onFriendShip(friendship) {
-    console.log(friendship.contact().name() + ' 请求添加好友')
-    if (friendship.type() === 2) {
-        await friendship.accept()
+    try {
+        console.log(friendship.contact().name() + ' 请求添加好友')
+        if (friendship.type() === 2) {
+            await friendship.accept()
+        }
+    }
+    catch (e) {
+        console.error(e)
     }
 }
 
@@ -46,17 +50,26 @@ async function onFriendShip(friendship) {
  * @returns {Promise<void>}
  */
 async function onMessage(msg) {
-    console.log('onMessage')
-    // 默认消息回复
-    await defaultMessage(msg, bot)
-    // 消息分片
-    // await shardingMessage(msg,bot)
+    try {
+        // 默认消息回复
+        await defaultMessage(msg, bot)
+        // 消息分片
+        // await shardingMessage(msg,bot)
+    }
+    catch (e) {
+        console.error(e)
+    }
 }
 
 async function onRoomInvitation(roomInvitation) {
-    console.log('onRoomInvitation')
-    // 接受邀请
-    await roomInvitation.accept()
+    try {
+        console.log('onRoomInvitation')
+        // 接受邀请
+        await roomInvitation.accept()
+    }
+    catch (e) {
+        console.error(e)
+    }
 }
 
 // 初始化机器人
@@ -86,11 +99,11 @@ bot.on('friendship', onFriendShip)
 // 错误
 bot.on('error', (e) => {
     console.error('bot error: ', e)
-    console.log(' 程序退出,请重新运行程序')
-    bot.stop()
+    //console.log(' 程序退出,请重新运行程序')
+    //bot.stop()
 
 
-    process.exit()
+    //process.exit()
 })
 // 启动微信机器人
 function botStart() {
