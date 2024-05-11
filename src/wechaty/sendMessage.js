@@ -128,6 +128,49 @@ async function getReply(name, text) {
         if (order == 'h') {
             str = `${name} 掷出了${getRResult('d100')}`
         }
+        else if (order.startsWith('a') || order.startsWith('c')) {
+            var order = order.slice(1).trim();
+            if (order.length == 0) {
+                str = config.formatErrTips()
+            }
+            else {
+                var propValue = 0
+                var reason = ''
+                if (/^\d+/.test(order)) {
+                    propValue = order.match(/^\d+/)
+                    reason = order.replace(/^\d+/,'')
+                }
+                else if (/\d+$/.test(order)) {
+                    propValue = order.match(/\d+$/)
+                    reason = order.replace(/\d+$/,'')
+                }
+                else {
+                    reason = order
+                }
+                var result = getRandomInt(100)
+
+                str = `${name}的"${reason}"检定结果为: D100=`
+                str += `${result}/${propValue} `
+                if (result == 1) {
+                    str += `大成功`
+                }
+                else if (result <= propValue / 5) {
+                    str += `极难成功`
+                }
+                else if (result <= propValue / 2) {
+                    str += `困难成功`
+                }
+                else if (result <= propValue) {
+                    str += `成功`
+                }
+                else if ((propValue < 50 && result <= 95) || (propValue >= 50 && result < 100)) {
+                    str += `失败`
+                }
+                else {
+                    str += `大失败`
+                }
+            }
+        }
         else if (order.length > 0) {
             var funcReg = /^(((\d+d\d+)|\d+)#)?((\d*d\d*)([\*xX\+](((\d*d\d*)|\d*)#)?((\d*d\d*)|\d*))*|([bp]\d*))$/
 
@@ -154,7 +197,7 @@ async function getReply(name, text) {
         var order = text.slice(3).trim()
 
         if (order.length > 0) {
-            var funcReg = /^(\d|\d+d\d+)\/(\d|\d+d\d+) \d+$/
+            var funcReg = /^(\d|\d+d\d+)(\+\d+)?\/(\d|\d+d\d+)(\+\d+)? \d+$/
             if (funcReg.test(order)) {
                 str = `${name}的理智检定:`
 
@@ -170,11 +213,29 @@ async function getReply(name, text) {
                     changeReg = failedReg;
                 }
                 else {
-                    str += `成功`
+                    if (scResult == 1) {
+                        str += `大成功`
+                    }
+                    else if (scResult <= san / 5) {
+                        str += `极难成功`
+                    }
+                    else if (scResult <= san / 2) {
+                        str += `困难成功`
+                    }
+                    else if (scResult <= san) {
+                        str += `成功`
+                    }
+                    else if ((san < 50 && scResult <= 95) || (san >= 50 && scResult < 100)) {
+                        str += `失败`
+                    }
+                    else {
+                        str += `大失败`
+                    }
+
                     changeReg = successReg;
                 }
                 var sanChangeValue = getDiceResult(changeReg).value;
-                var newSan = Math.max(0,san - sanChangeValue);
+                var newSan = Math.max(0, san - sanChangeValue);
 
                 str += `\n理智变化: ${san} ➯ ${newSan} (扣除${changeReg}=${sanChangeValue}点)`
                 if (newSan = 0) {
@@ -183,6 +244,9 @@ async function getReply(name, text) {
                 else if (sanChangeValue >= 5) {
                     str += `\n提示：单次损失理智超过5点，若智力检定(.ra 智力)通过，将进入临时性疯狂(可用.ti或.li抽取症状)`
                 }
+            }
+            else {
+                str = config.formatErrTips()
             }
         }
 
@@ -326,8 +390,7 @@ function getDiceResult(diceFunc) {
 
         result.value = sum
     }
-    else if (/\d+/.test(diceFunc))
-    {
+    else if (/\d+/.test(diceFunc)) {
         result.value = Number(diceFunc);
     }
     return result
