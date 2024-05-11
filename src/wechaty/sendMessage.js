@@ -7,9 +7,11 @@ import * as config from './config.js'
  * @returns {Promise<void>}
  */
 export async function defaultMessage(msg, bot) {
+    const date = new Date()
+    console.log(date)
     const contact = msg.talker() // 发消息人
     const receiver = msg.to() // 消息接收人
-    const content = msg.text() // 消息内容
+    const content = msg.text().toLowerCase() // 消息内容
     const room = msg.room() // 是否是群消息
     const roomName = (await room?.topic()) || null // 群名称
     const alias = (await contact.alias()) || (await contact.name()) // 发消息人昵称
@@ -32,9 +34,14 @@ export async function defaultMessage(msg, bot) {
             console.log(roomName + ":" + name + ': ', content)
             const response = await getReply(name, content)
             if (response != '') {
-                const date = new Date()
-                console.log(date + ":" + response)
-                await room.say(response)
+                console.log(response)
+                if (content != '.rh') {
+                    await room.say(response)
+                }
+
+                else {
+                    await contact.say(response)
+                }
             }
         }
         // 私人聊天，白名单内的直接发送
@@ -43,8 +50,7 @@ export async function defaultMessage(msg, bot) {
             const response = await getReply(name, content)
 
             if (response != '') {
-                const date = new Date()
-                console.log(date + ":" + response)
+                console.log(response)
                 await contact.say(response)
             }
         }
@@ -119,7 +125,10 @@ async function getReply(name, text) {
     }
     else if (text.startsWith(".r")) {
         var order = text.slice(2).trim()
-        if (order.length > 0) {
+        if (order == 'h') {
+            str = `${name} 掷出了${getRResult('d100')}`
+        }
+        else if (order.length > 0) {
             var funcReg = /^(((\d+d\d+)|\d+)#)?((\d*d\d*)([\*xX\+](((\d*d\d*)|\d*)#)?((\d*d\d*)|\d*))*|([bp]\d*))$/
 
             var firstBlankIndex = order.indexOf(' ')
@@ -133,13 +142,50 @@ async function getReply(name, text) {
             }
             else {
                 var diceFunc = order.slice(0, firstBlankIndex);
-                var reason = order.slice(firstBlankIndex+1)
+                var reason = order.slice(firstBlankIndex + 1)
                 str = `由于${reason}，${name}掷出了${getRResult(diceFunc)}`
             }
         }
         else {
             str = `${name} 掷出了${getRResult('d100')}`
         }
+    }
+    else if (text.startsWith('.sc')) {
+        var order = text.slice(3).trim()
+
+        if (order.length > 0) {
+            var funcReg = /^(\d|\d+d\d+)\/(\d|\d+d\d+) \d+$/
+            if (funcReg.test(order)) {
+                str = `${name}的理智检定:`
+
+                var successReg = order.slice(0, order.indexOf('/'));
+                var failedReg = order.slice(order.indexOf('/') + 1, order.indexOf(' '));
+                var san = order.slice(order.indexOf(' '));
+
+                var scResult = getRandomInt(100);
+                str += `\nd100=${scResult}/${san} `
+                var changeReg = '';
+                if (scResult > san) {
+                    str += `失败`
+                    changeReg = failedReg;
+                }
+                else {
+                    str += `成功`
+                    changeReg = successReg;
+                }
+                var sanChangeValue = getDiceResult(changeReg).value;
+                var newSan = Math.max(0,san - sanChangeValue);
+
+                str += `\n理智变化: ${san} ➯ ${newSan} (扣除${changeReg}=${sanChangeValue}点)`
+                if (newSan = 0) {
+                    str += `\n提示：理智归零，已永久疯狂(可用.ti或.li抽取症状)`
+                }
+                else if (sanChangeValue >= 5) {
+                    str += `\n提示：单次损失理智超过5点，若智力检定(.ra 智力)通过，将进入临时性疯狂(可用.ti或.li抽取症状)`
+                }
+            }
+        }
+
     }
     return str;
 }
@@ -200,7 +246,7 @@ function getDiceResult(diceFunc) {
         result.detail += '奖励'
 
         var bCount = 1
-        if (/b\d+/.test(diceFunc )) {
+        if (/b\d+/.test(diceFunc)) {
             bCount = Number(diceFunc.match(/b\d+/)[0].replace('b', ''))
         }
         var baseResult = getDiceResult('d100')
@@ -240,28 +286,28 @@ function getDiceResult(diceFunc) {
         var multiValue = Number(diceFunc.match(/\+\d+/)[0].replace(/\+/, ''))
         var currentResult = getDiceResult(diceFunc.replace(/\+\d+/, ''));
         if (!/\d+\[/.test(currentResult.detail)) {
-            currentResult.detail = currentResult.value+currentResult.detail
+            currentResult.detail = currentResult.value + currentResult.detail
         }
         result.detail = `${currentResult.detail} + ${multiValue}`
         result.value = currentResult.value + multiValue
     }
-    else if (/[*xX]/.test(diceFunc )) {
+    else if (/[*xX]/.test(diceFunc)) {
         var multiValue = Number(diceFunc.match(/[*xX]\d+/)[0].replace(/[*xX]/, ''))
         var currentResult = getDiceResult(diceFunc.replace(/[*xX]\d+/, ''));
         if (!/\d+\[/.test(currentResult.detail)) {
-            currentResult.detail = currentResult.value+currentResult.detail
+            currentResult.detail = currentResult.value + currentResult.detail
         }
         result.detail = `${currentResult.detail} * ${multiValue}`
         result.value = currentResult.value * multiValue
     }
-    else if (/^\d*d\d*$/.test(diceFunc )) {
+    else if (/^\d*d\d*$/.test(diceFunc)) {
         var runTime = 1;
         var diceMax = 100;
 
         if (/\d+d/.test(diceFunc)) {
             runTime = diceFunc.match(/\d+d/)[0].replace('d', '');
         }
-        if (/d\d+/.test(diceFunc )) {
+        if (/d\d+/.test(diceFunc)) {
             diceMax = diceFunc.match(/d\d+/)[0].replace('d', '');
         }
 
@@ -279,6 +325,10 @@ function getDiceResult(diceFunc) {
         }
 
         result.value = sum
+    }
+    else if (/\d+/.test(diceFunc))
+    {
+        result.value = Number(diceFunc);
     }
     return result
 }
